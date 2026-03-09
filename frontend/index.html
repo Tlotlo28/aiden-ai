@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Aiden — AI Startup Advisor</title>
+<link rel="icon" type="image/png" href="logo.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=Barlow:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --teal: #00D4C8;
+    --teal-dim: #00b8ad;
+    --teal-glow: rgba(0,212,200,0.18);
+    --teal-border: rgba(0,212,200,0.25);
+    --ai-blue: #1a6fa8;
+    --dark: #080c10;
+    --dark2: #0d1117;
+    --dark3: #111820;
+    --glass: rgba(255,255,255,0.035);
+    --glass-border: rgba(255,255,255,0.07);
+    --text: #e8eef4;
+    --muted: #6b7d8e;
+    --font-head: 'Barlow Condensed', sans-serif;
+    --font-body: 'Barlow', sans-serif;
+  }
+  *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+  html { scroll-behavior:smooth; }
+
+  body {
+    background: var(--dark);
+    color: var(--text);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content:'';
+    position:fixed; inset:0; z-index:0;
+    background:
+      radial-gradient(ellipse 80% 60% at 10% 0%, rgba(0,212,200,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 90% 100%, rgba(0,180,172,0.05) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 40% at 50% 50%, rgba(0,212,200,0.03) 0%, transparent 70%);
+    pointer-events:none;
+  }
+
+  body::after {
+    content:'';
+    position:fixed; inset:0; z-index:0;
+    background-image:
+      linear-gradient(rgba(0,212,200,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,200,0.03) 1px, transparent 1px);
+    background-size:60px 60px;
+    pointer-events:none;
+  }
+
+  main { position:relative; z-index:1; }
+
+  /* ── NAV ── */
+  nav {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 48px;
+    border-bottom:1px solid var(--glass-border);
+    backdrop-filter:blur(12px);
+    background:rgba(8,12,16,0.6);
+    position:sticky; top:0; z-index:100;
+  }
+  .nav-logo { display:flex; align-items:center; gap:14px; }
+  .nav-logo img {
+    height:58px; width:58px; object-fit:contain;
+    filter: drop-shadow(0 0 10px rgba(0,212,200,0.4));
+  }
+  .nav-brand { display:flex; flex-direction:column; }
+  .nav-logo-text {
+    font-family:var(--font-head);
+    font-size:2rem; font-weight:900;
+    letter-spacing:2px; line-height:1;
+    text-transform:uppercase;
+  }
+  .nav-logo-text .ai-part { color: var(--ai-blue); }
+  .nav-logo-text .den-part { color: var(--teal); }
+  .nav-tagline { font-size:0.73rem; color:var(--muted); letter-spacing:0.5px; margin-top:3px; font-family:var(--font-head); }
+  .nav-badge {
+    background:var(--teal-glow); border:1px solid var(--teal-border);
+    color:var(--teal); font-size:0.73rem; font-weight:700;
+    padding:5px 14px; border-radius:20px; letter-spacing:0.8px;
+    font-family:var(--font-head); text-transform:uppercase;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    text-align:center;
+    padding:80px 24px 60px;
+    max-width:800px;
+    margin:0 auto;
+  }
+  .hero-eyebrow {
+    display:inline-flex; align-items:center; gap:8px;
+    background:var(--teal-glow); border:1px solid var(--teal-border);
+    color:var(--teal); font-size:0.78rem; font-weight:700;
+    padding:6px 16px; border-radius:20px; margin-bottom:28px;
+    letter-spacing:1px; text-transform:uppercase;
+    font-family:var(--font-head);
+  }
+  .hero-eyebrow::before { content:'●'; font-size:0.5rem; animation:blink 1.5s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+  h1 {
+    font-family:var(--font-head);
+    font-size:clamp(2.8rem, 6.5vw, 5rem);
+    font-weight:900;
+    line-height:1.0;
+    margin-bottom:20px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+  }
+  h1 .ai-blue { color: var(--ai-blue); }
+  h1 .teal { color:var(--teal); }
+  .hero-sub { color:var(--muted); font-size:1.05rem; line-height:1.7; max-width:540px; margin:0 auto 48px; font-weight:400; }
+
+  /* ── INPUT CARD ── */
+  .input-card {
+    background:var(--glass); border:1px solid var(--glass-border);
+    backdrop-filter:blur(20px);
+    border-radius:20px; padding:32px;
+    max-width:720px; margin:0 auto;
+    box-shadow:0 8px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06);
+  }
+  .input-label {
+    font-family:var(--font-head);
+    font-size:0.82rem; font-weight:700;
+    color:var(--teal); letter-spacing:1.5px; text-transform:uppercase;
+    margin-bottom:12px; display:block;
+  }
+  textarea {
+    width:100%; min-height:130px;
+    background:rgba(0,0,0,0.3); border:1px solid var(--glass-border);
+    border-radius:12px; padding:16px;
+    color:var(--text); font-family:var(--font-body); font-size:0.97rem;
+    resize:vertical; outline:none; transition:border-color 0.2s; line-height:1.6;
+  }
+  textarea:focus { border-color:var(--teal-border); box-shadow:0 0 0 3px rgba(0,212,200,0.07); }
+  textarea::placeholder { color:var(--muted); }
+
+  .btn-validate {
+    width:100%; margin-top:16px;
+    background:linear-gradient(135deg, var(--teal), var(--teal-dim));
+    color:#080c10; font-family:var(--font-head);
+    font-size:1.1rem; font-weight:900;
+    padding:16px 32px; border:none; border-radius:12px; cursor:pointer;
+    letter-spacing:2px; text-transform:uppercase; transition:all 0.2s;
+    position:relative; overflow:hidden;
+  }
+  .btn-validate::after { content:''; position:absolute; inset:0; background:rgba(255,255,255,0); transition:background 0.2s; }
+  .btn-validate:hover::after { background:rgba(255,255,255,0.08); }
+  .btn-validate:active { transform:scale(0.99); }
+  .btn-validate:disabled { opacity:0.5; cursor:not-allowed; }
+
+  /* ── LOADING ── */
+  .loading-wrap { display:none; text-align:center; padding:60px 24px; }
+  .loading-wrap.active { display:block; }
+  .spinner {
+    width:56px; height:56px; border-radius:50%;
+    border:3px solid rgba(0,212,200,0.15); border-top-color:var(--teal);
+    animation:spin 0.9s linear infinite; margin:0 auto 24px;
+  }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .loading-text { font-family:var(--font-head); color:var(--teal); font-size:1.3rem; font-weight:900; letter-spacing:2px; text-transform:uppercase; }
+  .loading-sub { color:var(--muted); font-size:0.88rem; margin-top:8px; }
+
+  /* ── RESULTS ── */
+  #results { display:none; max-width:900px; margin:0 auto; padding:0 24px 80px; }
+  #results.show { display:block; animation:fadeUp 0.5s ease; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+
+  .section-header {
+    font-family:var(--font-head); font-size:0.75rem; font-weight:800;
+    color:var(--teal); letter-spacing:2px; text-transform:uppercase;
+    margin-bottom:20px; display:flex; align-items:center; gap:10px;
+  }
+  .section-header::after { content:''; flex:1; height:1px; background:linear-gradient(to right, var(--teal-border), transparent); }
+
+  .score-banner {
+    background:var(--glass); border:1px solid var(--glass-border);
+    backdrop-filter:blur(20px); border-radius:20px; padding:32px 36px; margin-bottom:24px;
+    display:grid; grid-template-columns:1fr auto; gap:24px; align-items:center;
+    box-shadow:0 4px 30px rgba(0,0,0,0.3);
+  }
+  .idea-title { font-family:var(--font-head); font-size:1.5rem; font-weight:900; margin-bottom:8px; letter-spacing:0.5px; text-transform:uppercase; }
+  .aiden-verdict { color:#9fb3c2; line-height:1.7; font-size:0.95rem; }
+  .score-ring { text-align:center; flex-shrink:0; }
+  .ring-svg { transform:rotate(-90deg); }
+  .ring-bg { fill:none; stroke:rgba(0,212,200,0.1); stroke-width:8; }
+  .ring-fill { fill:none; stroke:var(--teal); stroke-width:8; stroke-linecap:round; transition:stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1); }
+  .ring-number { font-family:var(--font-head); font-size:2rem; font-weight:900; fill:var(--teal); dominant-baseline:middle; text-anchor:middle; transform:rotate(90deg) translate(0, -100px); }
+  .ring-label { fill:var(--muted); font-size:0.6rem; dominant-baseline:middle; text-anchor:middle; transform:rotate(90deg) translate(18px, -100px); }
+
+  .cards-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:24px; }
+  @media(max-width:640px){ .cards-grid { grid-template-columns:1fr; } }
+
+  .glass-card {
+    background:var(--glass); border:1px solid var(--glass-border);
+    backdrop-filter:blur(16px); border-radius:16px; padding:24px;
+    box-shadow:0 4px 20px rgba(0,0,0,0.2);
+  }
+
+  .demand-score { font-family:var(--font-head); font-size:2.8rem; font-weight:900; color:var(--teal); }
+  .demand-verdict { font-size:0.8rem; color:var(--muted); margin-bottom:12px; text-transform:uppercase; letter-spacing:0.8px; font-family:var(--font-head); font-weight:700; }
+  .progress-bar { height:6px; background:rgba(255,255,255,0.06); border-radius:3px; overflow:hidden; margin-bottom:14px; }
+  .progress-fill { height:100%; background:linear-gradient(90deg, var(--teal), #00f5eb); border-radius:3px; transition:width 1s ease; width:0; }
+  .demand-analysis { color:#9fb3c2; font-size:0.9rem; line-height:1.6; }
+
+  .pill { display:inline-block; padding:3px 10px; border-radius:20px; font-size:0.7rem; font-weight:700; letter-spacing:0.5px; font-family:var(--font-head); text-transform:uppercase; }
+  .pill-high { background:rgba(239,68,68,0.15); color:#f87171; border:1px solid rgba(239,68,68,0.2); }
+  .pill-medium { background:rgba(234,179,8,0.15); color:#facc15; border:1px solid rgba(234,179,8,0.2); }
+  .pill-low { background:rgba(34,197,94,0.15); color:#4ade80; border:1px solid rgba(34,197,94,0.2); }
+  .pill-teal { background:var(--teal-glow); color:var(--teal); border:1px solid var(--teal-border); }
+
+  .result-list { list-style:none; display:flex; flex-direction:column; gap:12px; }
+  .result-item { background:rgba(0,0,0,0.2); border:1px solid var(--glass-border); border-radius:10px; padding:14px 16px; }
+  .result-item-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+  .result-item-name { font-family:var(--font-head); font-weight:800; font-size:1rem; letter-spacing:0.3px; }
+  .result-item-desc { color:#9fb3c2; font-size:0.86rem; line-height:1.5; }
+
+  .links-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(200px,1fr)); gap:10px; }
+  .link-item { background:rgba(0,0,0,0.25); border:1px solid var(--glass-border); border-radius:10px; padding:14px; text-decoration:none; color:var(--text); transition:border-color 0.2s, transform 0.2s; display:block; }
+  .link-item:hover { border-color:var(--teal-border); transform:translateY(-2px); }
+  .link-type { font-size:0.7rem; color:var(--teal); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:6px; font-family:var(--font-head); font-weight:700; }
+  .link-title { font-size:0.88rem; font-weight:500; line-height:1.4; }
+
+  .checklist { list-style:none; display:flex; flex-direction:column; gap:10px; }
+  .check-item { display:flex; align-items:flex-start; gap:12px; background:rgba(0,0,0,0.2); border:1px solid var(--glass-border); border-radius:10px; padding:14px 16px; cursor:pointer; transition:border-color 0.2s; }
+  .check-item:hover { border-color:var(--teal-border); }
+  .check-item.done { border-color:rgba(34,197,94,0.3); }
+  .check-box { width:20px; height:20px; border-radius:6px; border:2px solid var(--teal-border); flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:all 0.2s; margin-top:1px; }
+  .check-item.done .check-box { background:var(--teal); border-color:var(--teal); }
+  .check-tick { color:#080c10; font-size:0.75rem; font-weight:900; display:none; }
+  .check-item.done .check-tick { display:block; }
+  .check-text { font-size:0.92rem; line-height:1.5; color:#cdd5db; }
+  .check-item.done .check-text { color:var(--muted); text-decoration:line-through; }
+
+  /* ── MODALS ── */
+  .modal-overlay, .plan-modal-overlay {
+    display:none; position:fixed; inset:0; z-index:500;
+    background:rgba(0,0,0,0.7); backdrop-filter:blur(6px);
+    align-items:center; justify-content:center;
+  }
+  .modal-overlay.active, .plan-modal-overlay.active { display:flex; }
+  .modal, .plan-modal {
+    background:var(--dark3); border:1px solid var(--glass-border);
+    border-radius:20px; padding:40px 36px; max-width:420px; width:90%;
+    text-align:center; animation:fadeUp 0.3s ease;
+  }
+  .modal-icon { font-size:2.8rem; margin-bottom:16px; }
+  .modal-title { font-family:var(--font-head); font-size:1.5rem; font-weight:900; margin-bottom:12px; color:var(--teal); letter-spacing:1px; text-transform:uppercase; }
+  .modal-msg { color:var(--muted); line-height:1.6; margin-bottom:24px; font-size:0.93rem; }
+  .modal-close { background:var(--teal-glow); border:1px solid var(--teal-border); color:var(--teal); font-family:var(--font-head); font-size:0.9rem; font-weight:800; padding:10px 28px; border-radius:10px; cursor:pointer; transition:background 0.2s; letter-spacing:1px; text-transform:uppercase; }
+  .modal-close:hover { background:rgba(0,212,200,0.25); }
+  .plan-modal h3 { font-family:var(--font-head); font-size:1.7rem; font-weight:900; margin-bottom:12px; letter-spacing:0.5px; text-transform:uppercase; }
+  .plan-modal p { color:var(--muted); line-height:1.6; margin-bottom:28px; font-size:0.93rem; }
+  .plan-btns { display:flex; gap:12px; justify-content:center; }
+  .btn-yes { background:linear-gradient(135deg, var(--teal), var(--teal-dim)); color:#080c10; font-family:var(--font-head); font-weight:900; padding:12px 28px; border:none; border-radius:10px; cursor:pointer; font-size:1rem; transition:opacity 0.2s; letter-spacing:1px; text-transform:uppercase; }
+  .btn-yes:hover { opacity:0.9; }
+  .btn-no { background:var(--glass); border:1px solid var(--glass-border); color:var(--muted); font-family:var(--font-head); font-weight:700; padding:12px 28px; border-radius:10px; cursor:pointer; font-size:1rem; transition:border-color 0.2s; text-transform:uppercase; letter-spacing:0.5px; }
+  .btn-no:hover { border-color:var(--muted); color:var(--text); }
+
+  /* ── SUCCESS STORIES ── */
+  #stories { padding:80px 24px; max-width:1200px; margin:0 auto; }
+  .stories-title { font-family:var(--font-head); font-size:clamp(2.4rem,5vw,3.8rem); font-weight:900; text-align:center; margin-bottom:12px; letter-spacing:1px; text-transform:uppercase; }
+  .stories-sub { text-align:center; color:var(--muted); margin-bottom:52px; font-size:0.95rem; }
+  .stories-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(300px,1fr)); gap:20px; }
+
+  .story-card {
+    background:var(--glass); border:1px solid var(--glass-border);
+    backdrop-filter:blur(16px); border-radius:18px; padding:28px;
+    transition:border-color 0.3s, transform 0.3s; position:relative; overflow:hidden;
+  }
+  .story-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg, transparent, var(--teal), transparent); opacity:0; transition:opacity 0.3s; }
+  .story-card:hover { border-color:var(--teal-border); transform:translateY(-4px); }
+  .story-card:hover::before { opacity:1; }
+  .story-emoji { font-size:2rem; margin-bottom:14px; }
+  .story-name { font-family:var(--font-head); font-weight:900; font-size:1.2rem; margin-bottom:4px; letter-spacing:0.5px; text-transform:uppercase; }
+  .story-venture { color:var(--teal); font-size:0.82rem; font-weight:800; margin-bottom:14px; text-transform:uppercase; letter-spacing:1px; font-family:var(--font-head); }
+  .story-text { color:#9fb3c2; font-size:0.88rem; line-height:1.7; }
+  .story-start { margin-top:14px; padding-top:14px; border-top:1px solid var(--glass-border); font-size:0.78rem; color:var(--muted); font-family:var(--font-head); letter-spacing:0.3px; }
+  .story-start strong { color:var(--teal); }
+
+  footer { text-align:center; padding:32px; border-top:1px solid var(--glass-border); color:var(--muted); font-size:0.82rem; font-family:var(--font-head); letter-spacing:0.8px; text-transform:uppercase; }
+  footer span { color:var(--teal); }
+
+  ::-webkit-scrollbar { width:6px; }
+  ::-webkit-scrollbar-track { background:var(--dark); }
+  ::-webkit-scrollbar-thumb { background:rgba(0,212,200,0.2); border-radius:3px; }
+  ::-webkit-scrollbar-thumb:hover { background:rgba(0,212,200,0.4); }
+</style>
+</head>
+<body>
+<main>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <img src="logo.png" alt="Aiden Logo" onerror="this.style.display='none'"/>
+    <div class="nav-brand">
+      <div class="nav-logo-text"><span class="ai-part">AI</span><span class="den-part">DEN</span></div>
+      <div class="nav-tagline">Your AI Startup Advisor</div>
+    </div>
+  </div>
+  <div class="nav-badge"> Live · Llama 3.3</div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">Validate Before You Build</div>
+  <h1>Hi, I'm <span class="ai-blue">Ai</span><span class="teal">den.</span><br/>Let's Pressure-Test<br/>Your Idea.</h1>
+  <p class="hero-sub">Paste your startup idea below. I'll break down market demand, competitors, how to make money, risks, where to advertise — and give you a real advisor's take in seconds.</p>
+
+  <div class="input-card">
+    <label class="input-label" for="ideaInput">Your Business Idea</label>
+    <textarea id="ideaInput" placeholder="e.g. An app that connects local farmers directly with city restaurants, cutting out distributors and letting restaurants source fresh produce daily..."></textarea>
+    <button class="btn-validate" onclick="handleValidate()">Analyze My Idea →</button>
+  </div>
+</section>
+
+<!-- LOADING -->
+<div class="loading-wrap" id="loading">
+  <div class="spinner"></div>
+  <div class="loading-text">Aiden is Thinking...</div>
+  <div class="loading-sub">Analyzing market demand, competitors, risks & more</div>
+</div>
+
+<!-- RESULTS -->
+<div id="results">
+  <div style="max-width:900px;margin:0 auto;padding:0 24px 32px;">
+    <div class="score-banner">
+      <div>
+        <div class="idea-title" id="ideaTitle"></div>
+        <div class="aiden-verdict" id="aidenVerdict"></div>
+      </div>
+      <div class="score-ring">
+        <svg class="ring-svg" width="100" height="100" viewBox="0 0 100 100">
+          <circle class="ring-bg" cx="50" cy="50" r="42"/>
+          <circle class="ring-fill" id="ringFill" cx="50" cy="50" r="42" stroke-dasharray="264" stroke-dashoffset="264"/>
+          <text class="ring-number" id="ringNumber" x="50" y="50">0</text>
+          <text class="ring-label" x="50" y="64">/ 100</text>
+        </svg>
+        <div style="font-size:0.7rem;color:var(--muted);margin-top:4px;text-align:center;font-family:var(--font-head);letter-spacing:1.5px;text-transform:uppercase;">Overall Score</div>
+      </div>
+    </div>
+
+    <div class="section-header">Market Analysis</div>
+    <div class="cards-grid">
+      <div class="glass-card">
+        <div class="section-header" style="margin-bottom:16px">Market Demand</div>
+        <div class="demand-score" id="demandScore">—</div>
+        <div class="demand-verdict" id="demandVerdict"></div>
+        <div class="progress-bar"><div class="progress-fill" id="demandBar"></div></div>
+        <div class="demand-analysis" id="demandAnalysis"></div>
+      </div>
+      <div class="glass-card">
+        <div class="section-header" style="margin-bottom:16px">Competitors</div>
+        <ul class="result-list" id="competitorsList"></ul>
+      </div>
+    </div>
+
+    <div class="section-header">Revenue & Risks</div>
+    <div class="cards-grid">
+      <div class="glass-card">
+        <div class="section-header" style="margin-bottom:16px">Monetization Ideas</div>
+        <ul class="result-list" id="monetizationList"></ul>
+      </div>
+      <div class="glass-card">
+        <div class="section-header" style="margin-bottom:16px">Key Risks</div>
+        <ul class="result-list" id="risksList"></ul>
+      </div>
+    </div>
+
+    <div class="section-header">Where to Advertise</div>
+    <div class="glass-card" style="margin-bottom:24px">
+      <ul class="result-list" id="advertisingList"></ul>
+    </div>
+
+    <div class="section-header">Learn More</div>
+    <div class="glass-card" style="margin-bottom:24px">
+      <div class="links-grid" id="linksList"></div>
+    </div>
+
+    <div class="section-header">Your Startup Checklist</div>
+    <div class="glass-card">
+      <ul class="checklist" id="checklist"></ul>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS STORIES -->
+<section id="stories">
+  <div class="section-header" style="max-width:1200px;margin:0 auto 20px;">Proof It's Possible</div>
+  <h2 class="stories-title">They Started With <span style="color:var(--teal)">Nothing.</span><br/>Look at Them Now.</h2>
+  <p class="stories-sub">15 real people from across the globe — including right here in Africa. Real ideas. Real results. Your story could be next.</p>
+
+  <div class="stories-grid">
+
+    <div class="story-card">
+      <div class="story-name">Strive Masiyiwa</div>
+      <div class="story-venture">🇿🇼 Econet Wireless</div>
+      <div class="story-text">Fought the Zimbabwean government in court for 5 years just for the right to start a mobile network. With no government backing and near-zero resources, he built Econet into a multi-billion dollar telecom operating across 15+ African countries.</div>
+      <div class="story-start">Started with: <strong>A court battle & unshakeable belief</strong></div>
+    </div>
+
+    <div class="story-card">
+      <div class="story-name">Aliko Dangote</div>
+      <div class="story-venture">🇳🇬 Dangote Group</div>
+      <div class="story-text">Started by selling sweets and groundnuts as a child in Nigeria. Borrowed the equivalent of $3,000 from his uncle to trade commodities. Today the Dangote Group is Africa's largest industrial conglomerate spanning cement, sugar, oil and more.</div>
+      <div class="story-start">Started with: <strong>A $3,000 loan & a trading stall</strong></div>
+    </div>
+
+    <div class="story-card">
+      <div class="story-name">Bethlehem Tilahun Alemu</div>
+      <div class="story-venture">🇪🇹 SoleRebels</div>
+      <div class="story-text">Grew up in Addis Ababa's poorest neighbourhood. With no investors, no loans, and no connections, she started making footwear by hand from recycled tyres in 2004. SoleRebels became Africa's first globally certified fair trade footwear company, now sold in 55 countries.</div>
+      <div class="story-start">Started with: <strong>Recycled tyres & handcraft skills</strong></div>
+    </div>
+
+    <div class="story-card">
+      <div class="story-name">Rapelang Rabana</div>
+      <div class="story-venture">🇿🇦 Rekindle Learning</div>
+      <div class="story-text">Born in Botswana, raised in South Africa, she co-founded her first tech company at 22 while still a student at UCT. Later founded Rekindle Learning, a mobile learning platform that transformed corporate training across Africa. Named a WEF Young Global Leader.</div>
+      <div class="story-start">Started with: <strong>A student laptop & a vision for Africa</strong></div>
+    </div>
+
+    <div class="story-card">
+      <div class="story-name">Ashish Thakkar</div>
+      <div class="story-venture">🇺🇬 Mara Group</div>
+      <div class="story-text">Born to Ugandan-Indian parents who fled with nothing during Idi Amin's expulsions. At 15, he started selling second-hand computers from a market stall in Kampala. Today the Mara Group operates across 25 African countries in tech, real estate, and manufacturing.</div>
+      <div class="story-start">Started with: <strong>A market stall at age 15</strong></div>
+    </div>
+
+    <div class="story-card">
+      <div class="story-name">Nadia Rawjee</div>
+      <div class="story-venture">🇿🇦 Naked Insurance</div>
+      <div class="story-text">Co-founded Naked Insurance in South Africa to make car insurance fair and transparent using AI. Built from scratch into one of South Africa's fastest growing insurtech startups, disrupting a billion-rand industry dominated by old-guard companies — proving African founders can out-innovate global giants.</div>
+      <div class="story-start">Started with: <strong>A fair idea in an unfair industry</strong></div>
+    </div>
+
+    <div class="story-card">
+      <div class="story-name">Howard Schultz</div>
+      <div class="story-venture">🇺🇸 Starbucks</div>
+      <div class="story-text">Grew up in Brooklyn public housing. Rejected by investors over 200 times when he pitched the espresso bar concept. Bought the company himself with borrowed money and turned a local coffee bean shop into 35,000+ stores worldwide.</div>
+      <div class="story-start">Started with: <strong>Borrowed funds & a rejected idea</strong></div>
+    </div>
+
+    <div class="story-card">
+      <div class="story-name">Sara Blakely</div>
+      <div class="story-venture">🇺🇸 Spanx</div>
+      <div class="story-text">Was selling fax machines door-to-door when she had the idea to cut the feet off her pantyhose. Started Spanx with $5,000 in savings, no fashion background, no business degree — just a problem she wanted to solve.</div>
+      <div class="story-start">Started with: <strong>$5,000 and a simple idea</strong></div>
+    </div>
+
+    <div class="story-card">
+      <div class="story-name">Jan Koum</div>
+      <div class="story-venture">🇺🇦 WhatsApp</div>
+      <div class="story-text">Immigrated from Ukraine and survived on food stamps in California. Taught himself to code from used textbooks. Built WhatsApp in 2009. Facebook bought it in 2014 for $19 billion, making him one of the world's richest individuals.</div>
+      <div class="story-start">Started with: <strong>Food stamps & a library card</strong></div>
+    </div>
+
+    <div class="story-card">
+      <div class="story-name">Melanie Perkins</div>
+      <div class="story-venture">🇦🇺 Canva</div>
+      <div class="story-text">Was teaching design software at university, frustrated by how complex it was. Pitched Canva to over 100 investors — almost all said no. Launched in 2013 focusing on simplicity. Now used by 150 million people in 190 countries.</div>
+      <div class="story-start">Started with: <strong>100+ rejections & sheer belief</strong></div>
+    </div>
+
+    <div class="story-card">
+      <div class="story-name">Kevin Plank</div>
+      <div class="story-venture">🇺🇸 Under Armour</div>
+      <div class="story-text">Nearly broke after college. Took $20,000 in savings and racked up $40,000 in credit card debt to make moisture-wicking shirts. First big sale was $17,000 to Georgia Tech. Within years had deals with two dozen NFL teams.</div>
+      <div class="story-start">Started with: <strong>$20K savings + maxed credit cards</strong></div>
+    </div>
+
+    <div class="story-card">
+      <div class="story-name">John Paul DeJoria</div>
+      <div class="story-venture">🇺🇸 Paul Mitchell</div>
+      <div class="story-text">Once homeless, living in his car with his son. Borrowed $700 and cold-called salons to sell hair products door-to-door. That $700 turned into Paul Mitchell Systems, worth over $900 million. He later co-founded Patrón Spirits.</div>
+      <div class="story-start">Started with: <strong>$700 and a car to sleep in</strong></div>
+    </div>
+
+    <div class="story-card">
+      <div class="story-name">Oprah Winfrey</div>
+      <div class="story-venture">🇺🇸 OWN & Harpo Productions</div>
+      <div class="story-text">Born in rural poverty in Mississippi, raised by her grandmother on a farm. Faced incredible adversity but channeled it into storytelling. Started as a local news anchor, eventually built a media empire worth $2.8 billion driven entirely by her voice and vision.</div>
+      <div class="story-start">Started with: <strong>A microphone & a story to tell</strong></div>
+    </div>
+
+    <div class="story-card">
+      <div class="story-name">Sophia Amoruso</div>
+      <div class="story-venture">🇺🇸 Nasty Gal / Girlboss</div>
+      <div class="story-text">Was broke and working as a security guard when she started listing thrift store finds on eBay. Her eye for fashion turned into Nasty Gal — a multi-million dollar brand. Even after a setback, she reinvented herself and built the Girlboss media movement.</div>
+      <div class="story-start">Started with: <strong>An eBay account & thrift store finds</strong></div>
+    </div>
+
+    <div class="story-card">
+      <div class="story-name">Richard Branson</div>
+      <div class="story-venture">🇬🇧 Virgin Group</div>
+      <div class="story-text">Left school at 16 with dyslexia, convinced he'd never succeed academically. Started a student magazine with £100. That magazine became Virgin Records, then Virgin Atlantic, then 400+ companies under the Virgin brand worth billions.</div>
+      <div class="story-start">Started with: <strong>£100 & a school dropout certificate</strong></div>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  Built by a Tlotlo Masisi &nbsp;·&nbsp; Powered by <span>Groq + Llama 3.3</span> &nbsp;·&nbsp; Aiden is an AI advisor — always validate with professionals
+</footer>
+
+</main>
+
+<!-- OFF-TOPIC MODAL -->
+<div class="modal-overlay" id="offTopicModal">
+  <div class="modal">
+    <div class="modal-title">That's Not My Lane</div>
+    <div class="modal-msg">Hey, I'm Aiden — a startup advisor. I can only help with business ideas, products, services, and entrepreneurship. Ask me about your startup and I'll go deep on it.</div>
+    <button class="modal-close" onclick="closeModal('offTopicModal')">Got It, Let's Talk Business</button>
+  </div>
+</div>
+
+<!-- STARTUP PLAN MODAL -->
+<div class="plan-modal-overlay" id="planModal">
+  <div class="plan-modal">
+    <div style="font-size:2rem;margin-bottom:16px"></div>
+    <h3>Want a Step-by-Step Startup Plan?</h3>
+    <p>I can create a detailed, actionable step-by-step plan tailored to your idea — from day one to launch. Want me to include it in your results?</p>
+    <div class="plan-btns">
+      <button class="btn-yes" onclick="submitWithPlan(true)">Yes, Include It!</button>
+      <button class="btn-no" onclick="submitWithPlan(false)">No Thanks</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost:8000' : '';
+
+let pendingIdea = '';
+
+function handleValidate() {
+  const idea = document.getElementById('ideaInput').value.trim();
+  if (!idea || idea.length < 10) {
+    alert('Please describe your idea in at least a few sentences so Aiden can give you quality analysis.');
+    return;
+  }
+  pendingIdea = idea;
+  document.getElementById('planModal').classList.add('active');
+}
+
+function submitWithPlan(wantPlan) {
+  document.getElementById('planModal').classList.remove('active');
+  runValidation(pendingIdea, wantPlan);
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('active');
+}
+
+async function runValidation(idea, wantPlan) {
+  document.getElementById('results').classList.remove('show');
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('loading').classList.add('active');
+  document.querySelector('.btn-validate').disabled = true;
+  window.scrollTo({ top: 300, behavior: 'smooth' });
+
+  try {
+    const res = await fetch(`${API_BASE}/api/validate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ idea, want_plan: wantPlan })
+    });
+    if (!res.ok) { const err = await res.json(); throw new Error(err.detail || 'Something went wrong'); }
+    const data = await res.json();
+    document.getElementById('loading').classList.remove('active');
+    if (data.off_topic) { document.getElementById('offTopicModal').classList.add('active'); return; }
+    renderResults(data);
+  } catch (e) {
+    document.getElementById('loading').classList.remove('active');
+    alert('Error: ' + e.message);
+  } finally {
+    document.querySelector('.btn-validate').disabled = false;
+  }
+}
+
+const pill = (level, type) => {
+  if (!level) return '';
+  const l = level.toLowerCase();
+  let cls;
+  if (type === 'severity') cls = l==='high'?'pill-high':l==='medium'?'pill-medium':'pill-low';
+  else if (type === 'potential') cls = l==='high'?'pill-teal':l==='medium'?'pill-medium':'pill-low';
+  else cls = l==='free'?'pill-teal':l==='low'?'pill-low':l==='medium'?'pill-medium':'pill-high';
+  return `<span class="pill ${cls}">${level}</span>`;
+};
+
+function renderResults(data) {
+  const score = data.overall_score || 0;
+  setTimeout(() => {
+    document.getElementById('ringFill').style.strokeDashoffset = 264 - (score/100)*264;
+    document.getElementById('ringNumber').textContent = score;
+  }, 200);
+
+  document.getElementById('ideaTitle').textContent = data.idea_summary || '';
+  document.getElementById('aidenVerdict').textContent = data.aiden_verdict || '';
+
+  const md = data.market_demand || {};
+  document.getElementById('demandScore').textContent = (md.score||0)+'/100';
+  document.getElementById('demandVerdict').textContent = md.verdict||'';
+  document.getElementById('demandAnalysis').textContent = md.analysis||'';
+  setTimeout(() => { document.getElementById('demandBar').style.width = (md.score||0)+'%'; }, 300);
+
+  document.getElementById('competitorsList').innerHTML = (data.competitors||[]).map(c=>`
+    <li class="result-item"><div class="result-item-header"><span class="result-item-name">${c.name}</span>${pill(c.threat_level,'severity')}</div><div class="result-item-desc">${c.description}</div></li>`).join('');
+
+  document.getElementById('monetizationList').innerHTML = (data.monetization_ideas||[]).map(m=>`
+    <li class="result-item"><div class="result-item-header"><span class="result-item-name">${m.model}</span>${pill(m.potential,'potential')}</div><div class="result-item-desc">${m.description}</div></li>`).join('');
+
+  document.getElementById('risksList').innerHTML = (data.risks||[]).map(r=>`
+    <li class="result-item"><div class="result-item-header"><span class="result-item-name">${r.risk}</span>${pill(r.severity,'severity')}</div><div class="result-item-desc">${r.description}</div></li>`).join('');
+
+  document.getElementById('advertisingList').innerHTML = (data.advertising_channels||[]).map(a=>`
+    <li class="result-item"><div class="result-item-header"><span class="result-item-name">${a.channel}</span>${pill(a.cost,'cost')}</div><div class="result-item-desc">${a.strategy}</div></li>`).join('');
+
+  document.getElementById('linksList').innerHTML = (data.learn_more_links||[]).map(l=>`
+    <a class="link-item" href="${l.url}" target="_blank" rel="noopener"><div class="link-type">${l.type}</div><div class="link-title">${l.title}</div></a>`).join('');
+
+  document.getElementById('checklist').innerHTML = (data.startup_checklist||[]).map((item,i)=>`
+    <li class="check-item" onclick="toggleCheck(this)"><div class="check-box"><span class="check-tick">✓</span></div><span class="check-text">${item}</span></li>`).join('');
+
+  document.getElementById('results').style.display = 'block';
+  document.getElementById('results').classList.add('show');
+  setTimeout(()=>{ document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'}); },100);
+}
+
+function toggleCheck(el) { el.classList.toggle('done'); }
+</script>
+</body>
+</html>
