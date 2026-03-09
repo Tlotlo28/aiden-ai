@@ -1,10 +1,10 @@
-# 🤖 Aiden — AI Startup Advisor
+# Aiden — AI Startup Advisor
 
-> A dark glassmorphism web app that validates startup ideas using Groq's free Llama 3.3 API.
+> A web app that validates startup ideas using Groq's free Llama 3.3 API.
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 aiden-ai/
@@ -69,7 +69,7 @@ http://localhost:8000
 
 ---
 
-## 🚀 Deploy to Render (FREE Hosting)
+## Deploy to Render (FREE Hosting)
 
 1. Push your code to GitHub (make sure `.env` is in `.gitignore`!)
 2. Go to https://render.com → Sign up → **New Web Service**
@@ -113,7 +113,7 @@ http://localhost:8000
 
 ---
 
-## 🔒 Security Notes
+## Security Notes
 
 - Never commit your `.env` file
 - The `.gitignore` already protects it
